@@ -1,45 +1,113 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>Hello World</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhatsApp Bot UI</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        padding: 10px 60px;
-        font-family: sans-serif;
-        font-size: 1.5rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
+
+      .container {
+        background: #fff;
+        padding: 2rem 3rem;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+      }
+
+      h1 {
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        color: #333;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        transition: 0.3s;
+      }
+
+      input:focus {
+        border-color: #4f46e5;
+        outline: none;
+      }
+
+      button {
+        padding: 0.8rem 1.5rem;
+        background-color: #4f46e5;
+        color: #fff;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #4338ca;
+      }
+
       #greeting {
-        margin: 10px auto;
-        padding: 10px 60px;
-        border: 1px solid #222;
-      }
-      #greeting:empty {
-        display: none;
+        margin-top: 1.5rem;
+        font-size: 1.1rem;
+        color: #444;
       }
     </style>
-    <script type="module">
-      // Import the backend actor
-      import { backend } from 'declarations/backend';
-      // Add an event listener to the form
-      document.querySelector('form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        // Get the name from the input field
-        const name = document.getElementById('name').value.toString();
-        // Calling the method "greet" on the backend actor with the name
-        const greeting = await backend.greet(name);
-        // Display the greeting returned by the backend actor
-        document.getElementById('greeting').innerText = greeting;
-      });
-    </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const number = document.getElementById('number').value;
+      const message = document.getElementById('message').value;
+
+      try {
+        const res = await fetch('http://localhost:3000/send-whatsapp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ number, message })
+        });
+
+        const data = await res.json();
+        document.getElementById('greeting').innerText =
+          data.status === 'success' ? '✅ Message sent!' : '❌ Failed to send message.';
+      } catch (err) {
+        document.getElementById('greeting').innerText = '❌ Error sending message.';
+      }
+    });
+  });
+</script>
+
   </head>
   <body>
-    <main>
+    <div class="container">
+      <h1>WhatsApp Bot</h1>
       <form>
-        <label for="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
+        <input id="number" type="text" placeholder="WhatsApp Number (e.g., 2547XXXXXX)" />
+<input id="message" type="text" placeholder="Your Message" />
+
       </form>
-      <section id="greeting"></section>
-    </main>
+      <div id="greeting"></div>
+    </div>
   </body>
 </html>
